@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import config, Csv
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -25,7 +26,10 @@ SECRET_KEY = os.environ.get("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = int(os.environ.get("DEBUG", default=0))
 
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+# ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split()
+# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS").split(" ")
+
 
 # Application definition
 
@@ -38,7 +42,8 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'variables.apps.VariablesConfig',
-    'main.apps.MainConfig'
+    'main.apps.MainConfig',
+    'plan_result.apps.PlanResultConfig'
 ]
 
 MIDDLEWARE = [
@@ -82,16 +87,20 @@ WSGI_APPLICATION = 'core.wsgi.application'
 #         'NAME': BASE_DIR / 'db.sqlite3',
 #     }
 # }
+# from dotenv import load_dotenv
+
 DATABASES = {
     'default': {
-        "ENGINE": os.environ.get("POSTGRES_ENGINE", 'django.db.backends.postgresql'),
-        "NAME": os.environ.get("POSTGRES_DATABASE", 'name'),
-        "USER": os.environ.get("POSTGRES_USER", 'user'),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD", 'password'),
-        "HOST": os.environ.get('POSTGRES_HOST', 'localhost'),
-        "PORT": os.environ.get('POSTGRES_PORT', '5436'),
+        "ENGINE": config("POSTGRES_ENGINE", 'django.db.backends.postgresql'),
+        "NAME": config("POSTGRES_DATABASE", 'name'),
+        "USER": config("POSTGRES_USER", 'user'),
+        "PASSWORD": config("POSTGRES_PASSWORD", 'password'),
+        "HOST": config('POSTGRES_HOST', 'localhost'),
+        "PORT": config('POSTGRES_PORT', '5432'),
     }
 }
+
+# print("POSTGRES_HOST from env:", os.environ.get("POSTGRES_HOST"))
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
@@ -133,3 +142,24 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+CELERY_TIMEZONE = "Europe/Warsaw"
+CELERY_TASK_TRACK_STARTED = True
+CELERY_BROKER_URL = 'redis://localhost:6379'
+CELERY_RESULT_BACKEND = "redis://localhost:6379"
+
+
+from celery.schedules import crontab
+import variables.tasks
+import plan_result.tasks
+
+CELERY_BEAT_SCHEDULE = {
+    "read_variables_task": {
+        "task": "variables.tasks.variables_schedule_task",
+        "schedule": 0.75,
+    },
+    "plan_result_task": {
+        "task": "plan_result.tasks.plan_result_schedule_task",
+        "schedule": 5,
+    }
+}

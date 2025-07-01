@@ -6,21 +6,27 @@ class VariablesModel(DateTimeStampedModel):
     TYPE_VARIABLE = [
         (0, 'boolean'),
         (1, 'integer'),
-        (2, 'string')
+        (2, 'string'),
+        (3, 'float')
     ]
 
     variable_name = models.CharField(max_length=100, blank=False, null=False, unique=True)
     variable_address = models.CharField(max_length=100, blank=False, null=False)
     variable_type = models.PositiveSmallIntegerField(choices=TYPE_VARIABLE, default=0)
-    variable_value = models.CharField(max_length=100, blank=True, null=True)
-    cycle_time = models.FloatField(default=0.0)
-    value_time = models.PositiveSmallIntegerField(default=0)
-    timer_time = models.PositiveIntegerField(default=0)
-    date_time_device_update = models.PositiveBigIntegerField(default=0)
+    current_variable_value = models.CharField(max_length=100, blank=True, null=True)
+    true_value_counter = models.PositiveSmallIntegerField(default=0)
+    false_value_counter = models.PositiveSmallIntegerField(default=0)
+    true_value_current_time = models.FloatField(default=0.0)
+    false_value_current_time = models.FloatField(default=0.0)
+    true_value_time = models.FloatField(default=0.0)
+    false_value_time = models.FloatField(default=0.0)
+    true_value_timer_time = models.FloatField(default=0.0)
+    false_value_timer_time = models.FloatField(default=0.0)
+    true_value_cycle_time = models.FloatField(default=0.0)
+    false_value_cycle_time = models.FloatField(default=0.0)
 
     class Meta:
         ordering = ('variable_address',)
-        unique_together = ('variable_name', 'variable_address')
         verbose_name = 'Variable'
         verbose_name_plural = 'Variables'
 
@@ -37,7 +43,7 @@ class DevicesModel(DateTimeStampedModel):
 
     TYPE = [
         (0, 'binary'),
-        (1, 'ascii'),
+        (1, 'ascii')
     ]
 
     devices_name = models.CharField(max_length=100, blank=False, null=False, unique=True)
