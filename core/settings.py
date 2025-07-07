@@ -154,10 +154,10 @@ import variables.tasks
 import plan_result.tasks
 
 CELERY_BEAT_SCHEDULE = {
-    "read_variables_task": {
-        "task": "variables.tasks.variables_schedule_task",
-        "schedule": 0.75,
-    },
+    # "read_variables_task": {
+    #     "task": "variables.tasks.variables_schedule_task",
+    #     "schedule": 0.75,
+    # },
     "plan_result_task": {
         "task": "plan_result.tasks.plan_result_schedule_task",
         "schedule": 5,

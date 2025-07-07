@@ -6,8 +6,7 @@ from . import models
 class ProductionLinesAdmin(admin.ModelAdmin):
     list_display = [
         'production_line',
-        'counting_status',
-        'planned_working_time'
+        'shift'
     ]
 
 
@@ -22,6 +21,7 @@ class PlannedWorkingTimeAdmin(admin.ModelAdmin):
 @admin.register(models.PlannedBreakTime)
 class PlannedBreakTimeAdmin(admin.ModelAdmin):
     list_display = [
+        'production_line',
         'start_time',
         'end_time'
     ]

@@ -7,19 +7,11 @@ class PlannedWorkingTime(models.Model):
     end_time = models.TimeField()
 
     def __str__(self):
-        return f"{self.start_time} - {self.end_time}"
-
-
-class PlannedBreakTime(models.Model):
-    start_time = models.TimeField()
-    end_time = models.TimeField()
-
-    def __str__(self):
-        return f"{self.start_time} - {self.end_time}"
+        return f"{self.start_time}-{self.end_time}"
 
 
 class PlanResultQuantity(models.Model):
-    variable = models.OneToOneField(VariablesModel, on_delete=models.CASCADE, unique=True)
+    variable = models.ForeignKey(VariablesModel, on_delete=models.CASCADE)
     quantity = models.PositiveSmallIntegerField(default=0)
     planned_quantity = models.PositiveSmallIntegerField(default=0)
     planned_working_time = models.PositiveSmallIntegerField(default=0)
@@ -53,10 +45,10 @@ class ProductionLines(models.Model):
 
     production_line = models.PositiveSmallIntegerField(choices=LINE, default=0)
     shift = models.PositiveSmallIntegerField(choices=SHIFT, default=0)
-    plan_result = models.ManyToManyField(PlanResultQuantity, blank=True)
+    plan_result = models.OneToOneField(PlanResultQuantity, on_delete=models.CASCADE)
     counting_status = models.BooleanField(default=False)
     planned_working_time = models.OneToOneField(PlannedWorkingTime, on_delete=models.CASCADE)
-    planned_break_time = models.ManyToManyField(PlannedBreakTime, blank=True)
+
 
     class Meta:
         unique_together = ('production_line', 'shift')
@@ -64,4 +56,13 @@ class ProductionLines(models.Model):
         verbose_name_plural = 'ProductionLines'
 
     def __str__(self):
-        return f"{self.production_line}"
+        return f"{self.get_production_line_display()}/{self.get_shift_display()}"
+
+
+class PlannedBreakTime(models.Model):
+    production_line = models.ForeignKey(ProductionLines, on_delete=models.CASCADE, null=True)
+    start_time = models.TimeField()
+    end_time = models.TimeField()
+
+    def __str__(self):
+        return f"{self.production_line}: {self.start_time}-{self.end_time}"
