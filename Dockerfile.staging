@@ -1,0 +1,23 @@
+###########
+# BUILDER #
+###########
+
+# pull official base image
+FROM python:3.9.16-buster
+
+# set environment variables
+ENV PYTHONDONTWRITEBYTECODE 1
+ENV PYTHONUNBUFFERED 1
+
+RUN mkdir /ppms
+
+# set work directory
+WORKDIR /ppms
+
+# install dependencies
+COPY requirements.txt /ppms/
+RUN pip install --upgrade pip
+RUN apt-get update
+RUN apt-get install nano
+RUN pip install -r requirements.txt
+COPY . /ppms/

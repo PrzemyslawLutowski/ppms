@@ -1,3 +1,4 @@
+# Fragment kodu ppms\plan_result\tasks.py (celery)
 import django
 
 django.setup()
@@ -121,46 +122,3 @@ def plan_result_task():
                     balance_value_get = models.VariablesModel.objects.get(variable_name=variables_name[3])
                     balance_value_get.current_variable_value = str(plan_result.quantity_balance)
                     balance_value_get.save()
-
-
-# def plan_result_to_variable_task():
-#     lines = models.ProductionLines.objects.all()
-#
-#     for line in lines:
-#
-#         if line.production_line == 0:
-#             line_name = "A"
-#
-#         elif line.production_line == 1:
-#             line_name = "B"
-#
-#         elif line.production_line == 2:
-#             line_name = "C"
-#
-#         elif line.production_line == 3:
-#             line_name = "D"
-#
-#         variable_name = f"LineViewStatus{line_name}"
-#         line_view_status = models.VariablesModel.objects.get(variable_name=variable_name)
-#         line_view_status.current_variable_value = "1" if line.counting_status == True else "0"
-#         line_view_status.save()
-#
-#         variables_name = [f"PlanValue{line_name}", f"PlanTtValue{line_name}",
-#                           f"BalanceTtValue{line_name}", f"BalanceValue{line_name}"]
-#
-#         for plan_result in line.plan_result.all():
-#             plan_value_get = models.VariablesModel.objects.get(variable_name=variables_name[0])
-#             plan_value_get.current_variable_value = str(plan_result.planned_quantity)
-#             plan_value_get.save()
-#
-#             plan_tt_value_get = models.VariablesModel.objects.get(variable_name=variables_name[1])
-#             plan_tt_value_get.current_variable_value = str(plan_result.planned_cycle_time)
-#             plan_tt_value_get.save()
-#
-#             balance_tt_value_get = models.VariablesModel.objects.get(variable_name=variables_name[2])
-#             balance_tt_value_get.current_variable_value = str(plan_result.cycle_time_balance)
-#             balance_tt_value_get.save()
-#
-#             balance_value_get = models.VariablesModel.objects.get(variable_name=variables_name[3])
-#             balance_value_get.current_variable_value = str(plan_result.quantity_balance)
-#             balance_value_get.save()

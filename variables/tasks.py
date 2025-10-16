@@ -5,14 +5,9 @@ django.setup()
 from celery import shared_task
 from celery.utils.log import get_task_logger
 from .models import VariablesModel, DevicesModel
-from datetime import datetime, timezone, time
-from django.conf import settings
 from timeit import default_timer as timer
 from pymodbus.client import ModbusTcpClient
 import socket
-import time
-import json
-import os
 
 
 logger = get_task_logger(__name__)

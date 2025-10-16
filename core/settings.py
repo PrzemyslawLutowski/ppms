@@ -28,7 +28,7 @@ DEBUG = int(os.environ.get("DEBUG", default=0))
 
 # ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split()
 # ALLOWED_HOSTS = ["*"]
-ALLOWED_HOSTS = config("DJANGO_ALLOWED_HOSTS").split(" ")
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
 
 
 # Application definition
@@ -96,7 +96,7 @@ DATABASES = {
         "USER": config("POSTGRES_USER", 'user'),
         "PASSWORD": config("POSTGRES_PASSWORD", 'password'),
         "HOST": config('POSTGRES_HOST', 'localhost'),
-        "PORT": config('POSTGRES_PORT', '5432'),
+        "PORT": config('POSTGRES_PORT', '5430'),
     }
 }
 
@@ -154,10 +154,10 @@ import variables.tasks
 import plan_result.tasks
 
 CELERY_BEAT_SCHEDULE = {
-    # "read_variables_task": {
-    #     "task": "variables.tasks.variables_schedule_task",
-    #     "schedule": 0.75,
-    # },
+    "read_variables_task": {
+        "task": "variables.tasks.variables_schedule_task",
+        "schedule": 0.75,
+    },
     "plan_result_task": {
         "task": "plan_result.tasks.plan_result_schedule_task",
         "schedule": 5,
