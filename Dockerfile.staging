@@ -2,43 +2,41 @@
 # BUILDER #
 ###########
 
-# 1. Używamy oficjalnego obrazu bazowego (Buster, ale musimy poprawić źródła)
-FROM python:3.9.16-buster
+# Używamy nowszego, lżejszego obrazu bazowego opartego na Pythonie 3.11 i Debianie Bookworm (12).
+# Działają w nim aktualne repozytoria, więc nie potrzeba sed.
+FROM python:3.11-slim-bookworm
 
-# 2. Ustawiamy zmienne środowiskowe
+# Ustawiamy zmienne środowiskowe
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
-# 3. Ustawiamy katalog roboczy i tworzymy folder
+# Ustawiamy katalog roboczy. Tworzy katalog /ppms, jeśli nie istnieje.
 WORKDIR /ppms
 
-# 4. INSTALACJA ZALEŻNOŚCI SYSTEMOWYCH I PYTHONOWYCH
-# KOPIUJEMY TYLKO PLIK Z ZALEŻNOŚCIAMI (wykorzystanie cache)
+# INSTALACJA ZALEŻNOŚCI
+
+# 1. Kopiujemy plik z zależnościami (dla optymalnego cachowania)
 COPY requirements.txt /ppms/
 
-# A. Ustawienie repozytoriów na archiwalne dla Buster (poprawka błędu 404)
-# B. Aktualizacja listy pakietów
-# C. Instalacja pakietów systemowych
-# D. Czyszczenie cache APT, aby obraz był mniejszy
-RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
-    sed -i 's|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list && \
-    apt-get update && \
+# 2. Instalacja pakietów systemowych i czyszczenie cache APT
+# Dzielimy te kroki dla lepszej czytelności i kontroli.
+# Pamiętaj, aby dodać tutaj wszystkie niezbędne pakiety systemowe potrzebne do zbudowania zależności Pythona (np. build-essential, libpq-dev).
+RUN apt-get update && \
     apt-get install -y --no-install-recommends \
-        # Pamiętaj, aby dodać tutaj wszystkie niezbędne zależności build-time,
-        # np. jeśli używasz bazy PostgreSQL i potrzebujesz psycopg2:
+        # Przykładowe pakiety systemowe dla budowania (jeśli potrzebne):
         # build-essential \
         # libpq-dev \
         nano \
+    # Usuwamy pliki cache APT, aby zredukować rozmiar warstwy (czystość)
     && rm -rf /var/lib/apt/lists/*
 
-# 5. Instalacja zależności Pythona
-RUN pip install --upgrade pip
+# 3. Instalacja zależności Pythona (niepotrzebne jest oddzielne polecenie na upgrade pip)
 RUN pip install -r requirements.txt
 
-# 6. KOPIOWANIE KODU APLIKACJI
-# Kopiujemy resztę kodu do katalogu roboczego
+# 4. KOPIOWANIE KODU APLIKACJI
+# Kopiujemy resztę kodu do katalogu roboczego (na końcu, aby wykorzystać cache)
 COPY . /ppms/
 
-# 7. Definicja punktu wejścia (opcjonalnie, ale dobra praktyka)
-# ENTRYPOINT ["python"]
-# CMD ["manage.py", "runserver", "0.0.0.0:8000"]
+# 5. Definicja punktu wejścia/startu (Przykład, jeśli używasz Django/Flask)
+# Zmień na faktyczną komendę, np. gunicorn:
+# CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
