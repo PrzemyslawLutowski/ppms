@@ -1,3 +1,5 @@
+
+# Fragmęt kodu ppms\plan_result\models.py
 from django.db import models
 from variables.models import VariablesModel
 
