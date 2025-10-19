@@ -1,46 +1,24 @@
-
-Logo NotebookLM
-Docker
-Źródła
-Czat
-Studio
-Dockerfile for 3.9.16-buster
-Przewodnik po źródłach
-Tab 1
 ###########
 # BUILDER #
 ###########
-# 1. Używamy oficjalnego obrazu bazowego (Buster, ale musimy poprawić źródła)
+
 FROM python:3.9.16-buster
-# 2. Ustawiamy zmienne środowiskowe
+
 ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
-# 3. Ustawiamy katalog roboczy i tworzymy folder
+
 WORKDIR /ppms
-# 4. INSTALACJA ZALEŻNOŚCI SYSTEMOWYCH I PYTHONOWYCH
-# KOPIUJEMY TYLKO PLIK Z ZALEŻNOŚCIAMI (wykorzystanie cache)
+
 COPY requirements.txt /ppms/
-# A. Ustawienie repozytoriów na archiwalne dla Buster (poprawka błędu 404)
-# B. Aktualizacja listy pakietów
-# C. Instalacja pakietów systemowych
-# D. Czyszczenie cache APT, aby obraz był mniejszy
+
 RUN sed -i 's/deb.debian.org/archive.debian.org/g' /etc/apt/sources.list && \
 sed -i 's|security.debian.org|archive.debian.org/debian-security|g' /etc/apt/sources.list && \
 apt-get update && \
 apt-get install -y --no-install-recommends \
-# Pamiętaj, aby dodać tutaj wszystkie niezbędne zależności build-time,
-# np. jeśli używasz bazy PostgreSQL i potrzebujesz psycopg2:
-# build-essential \
-# libpq-dev \
 nano \
 && rm -rf /var/lib/apt/lists/*
-# 5. Instalacja zależności Pythona
+
 RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
-# 6. KOPIOWANIE KODU APLIKACJI
-# Kopiujemy resztę kodu do katalogu roboczego
-COPY . /ppms/
-# 7. Definicja punktu wejścia (opcjonalnie, ale dobra praktyka)
-# ENTRYPOINT ["python"]
-# CMD ["manage.py", "runserver", "0.0.0.0:8000"]
 
+COPY . /ppms/
